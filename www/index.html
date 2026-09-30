@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3b7cff">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ГлазОК — зрительное утомление</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--tx:#1b2333;--mut:#64708a;--ac:#2f6fed;--ok:#1f9d63;--bad:#d64545;--bd:#dde3ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141d;--card:#181e2b;--tx:#e8ecf5;--mut:#8b96ae;--ac:#5b8def;--bd:#283044}}
+:root[data-theme="dark"]{--bg:#10141d;--card:#181e2b;--tx:#e8ecf5;--mut:#8b96ae;--ac:#5b8def;--bd:#283044}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:14px}
+h1{font-size:22px;margin:4px 0}h2{font-size:18px;margin:0 0 8px}
+.sub{color:var(--mut);font-size:14px;margin:0 0 12px}
+nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}
+nav button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 12px;border-radius:20px;font-size:14px;cursor:pointer}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-size:15px;cursor:pointer;margin:4px 4px 4px 0}
+.btn.g{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+input,select,textarea{font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px;width:100%}
+label{font-size:14px;color:var(--mut);display:block;margin:8px 0 3px}
+.q{border-top:1px solid var(--bd);padding:10px 0}.q b{display:block;margin-bottom:6px;font-weight:600}
+.q span{display:inline-block;margin:0 10px 4px 0;font-size:14px}
+.big{font-size:40px;font-weight:700;text-align:center}
+.res{padding:10px;border-radius:10px;margin-top:8px;font-weight:600}
+.res.ok{background:rgba(31,157,99,.15);color:var(--ok)}.res.bad{background:rgba(214,69,69,.15);color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(20,1fr);gap:1px;font:600 clamp(10px,3.4vw,17px) monospace;user-select:none}
+.grid i{font-style:normal;text-align:center;padding:3px 0;border-radius:3px;cursor:pointer;border:1px solid transparent}
+.grid i.s{background:var(--ac);color:#fff}
+.stage{position:relative;height:220px;background:var(--bg);border-radius:12px;overflow:hidden;border:1px solid var(--bd)}
+#ball{position:absolute;width:36px;height:36px;border-radius:50%;background:var(--ac);left:0;top:0}
+.tbl{overflow-x:auto}table{border-collapse:collapse;font-size:13px;width:100%}td,th{border:1px solid var(--bd);padding:4px 6px;white-space:nowrap}
+.note{font-size:13px;color:var(--mut)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.92)}60%{transform:scale(1.03)}100%{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);color:var(--ok)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(47,111,237,.5)}50%{box-shadow:0 0 0 14px rgba(47,111,237,0)}}
+.card{animation:up .45s cubic-bezier(.2,.8,.2,1);transition:box-shadow .3s,transform .3s}
+.card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08)}
+nav button,.btn{transition:transform .2s,background .25s,color .25s,box-shadow .25s}
+nav button:hover,.btn:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(47,111,237,.25)}
+nav button:active,.btn:active{transform:scale(.95)}
+.grid i{transition:background .18s,color .18s,transform .18s}
+.grid i:hover{background:var(--bd)}.grid i.s{transform:scale(1.15)}
+.res,.big{animation:pop .5s cubic-bezier(.2,.8,.2,1)}
+.q{transition:background .25s}.q:hover{background:rgba(47,111,237,.05)}
+#ball{box-shadow:0 0 14px var(--ac);animation:glow 1.6s infinite}
+#tdisp.rest{animation:pulse 1s infinite}
+#btm{transition:color .3s}
+.bd{margin:6px 0 0;font-weight:400;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+body{min-height:100vh;background:linear-gradient(160deg,var(--bg) 40%,color-mix(in srgb,var(--ac,#3b7cff) 16%,var(--bg)));background-attachment:fixed;transition:color .3s}
+body[data-sec=q]{--ac:#3b7cff}body[data-sec=b]{--ac:#8a5cf6}body[data-sec=t]{--ac:#f08a24}body[data-sec=g]{--ac:#19a974}body[data-sec=d]{--ac:#e0508b}
+h1{background:linear-gradient(90deg,#3b7cff,#8a5cf6,#e0508b,#f08a24,#3b7cff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 8s linear infinite;display:inline-block}
+#eyeico{display:inline-block;animation:float 3s ease-in-out infinite;-webkit-text-fill-color:initial}
+.card{border-top:4px solid var(--ac);box-shadow:0 6px 22px -12px var(--ac);transition:border-color .4s,box-shadow .4s}
+.card.in{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1)}
+nav button{transition:transform .15s,background .3s,box-shadow .3s}nav button:hover{transform:translateY(-2px)}
+nav button.on{box-shadow:0 4px 14px -4px var(--ac);transform:translateY(-2px)}
+.btn{transition:transform .15s,box-shadow .2s,filter .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px -6px var(--ac);filter:brightness(1.08)}.btn:active{transform:scale(.95)}
+.btn.pulse{background:linear-gradient(90deg,#19a974,#3bc9a0);animation:pulse 1.6s ease-in-out infinite;font-weight:600}
+.res,.big{animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.res.bad{border-left:4px solid var(--bad)}.res.ok{border-left:4px solid var(--ok)}
+.q{transition:background .2s}.q:hover{background:color-mix(in srgb,var(--ac) 7%,transparent)}
+.grid i{transition:background .15s,transform .15s}.grid i:hover{transform:scale(1.3)}.grid i.s{animation:pop .25s}
+.stage{background:linear-gradient(120deg,var(--bg),color-mix(in srgb,var(--ac) 18%,var(--bg)),var(--bg));background-size:300% 300%;animation:flow 10s ease infinite}
+#ball{background:radial-gradient(circle at 35% 30%,#fff8,var(--ac) 60%);box-shadow:0 0 22px 6px var(--ac);transition:opacity .4s}
+#tdisp.run{animation:breath 2s ease-in-out infinite;color:var(--ac)}
+tr{animation:fadeUp .4s both}
+@keyframes flow{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-5px) rotate(6deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #19a97488}50%{box-shadow:0 0 0 12px #19a97400}}
+@keyframes breath{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+select{appearance:none;-webkit-appearance:none;cursor:pointer;border:2px solid var(--bd);border-radius:10px;padding:8px 32px 8px 12px;background-color:var(--card);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238b96ae' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .25s,box-shadow .25s,background-color .25s}
+select:hover{border-color:color-mix(in srgb,var(--ac) 55%,var(--bd))}
+select:focus,input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 22%,transparent)}
+select option{background:var(--card);color:var(--tx)}
+#qs select{width:auto;min-width:130px;padding-top:6px;padding-bottom:6px;font-size:14px}
+#qs select[data-l="1"]{border-color:#e9a23b;background-color:color-mix(in srgb,#e9a23b 14%,var(--card))}
+#qs select[data-l="2"]{border-color:var(--bad);background-color:color-mix(in srgb,var(--bad) 14%,var(--card))}
+
+select.hid{display:none}
+.dd{position:relative;display:block;width:100%}#qs .dd{display:inline-block;width:auto;min-width:140px}
+.dd-b{width:100%;text-align:left;font:inherit;color:var(--tx);cursor:pointer;border:2px solid var(--bd);border-radius:10px;padding:8px 32px 8px 12px;background-color:var(--card);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238b96ae' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .25s,box-shadow .25s,background-color .25s}
+#qs .dd-b{font-size:14px;padding-top:6px;padding-bottom:6px}
+.dd-b:hover{border-color:color-mix(in srgb,var(--ac) 55%,var(--bd))}
+.dd.open .dd-b,.dd-b:focus-visible{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 22%,transparent)}
+.dd-b[data-l="1"]{border-color:#e9a23b;background-color:color-mix(in srgb,#e9a23b 14%,var(--card))}
+.dd-b[data-l="2"]{border-color:var(--bad);background-color:color-mix(in srgb,var(--bad) 14%,var(--card))}
+.dd-l{display:none;position:absolute;z-index:30;left:0;min-width:100%;margin:4px 0 0;padding:5px;list-style:none;background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 34px -10px rgba(0,0,0,.35);transform-origin:top left}
+.dd.open .dd-l{display:block;animation:ddin .18s ease-out}
+.dd-l li{padding:9px 12px;border-radius:9px;cursor:pointer;font-size:15px;white-space:nowrap;color:var(--tx);transition:background .15s,transform .15s}
+.dd-l li:hover{background:color-mix(in srgb,var(--ac) 14%,transparent);transform:translateX(3px)}
+.dd-l li.sel{background:var(--ac);color:#fff;font-weight:600}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+
+.card.in{animation:tabin .6s cubic-bezier(.2,.9,.25,1) both}
+@keyframes tabin{0%{opacity:0;transform:translateX(var(--dx,0px)) scale(.94) rotateY(var(--ry,0deg));filter:blur(8px)}100%{opacity:1;transform:none;filter:none}}
+#wash{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:0}
+#wash.go{animation:wash .7s ease-out}
+@keyframes wash{0%{opacity:.9;clip-path:circle(0 at var(--x) var(--y))}70%{opacity:.5}100%{opacity:0;clip-path:circle(160% at var(--x) var(--y))}}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(70px);opacity:.35;background:var(--ac);transition:background .8s;pointer-events:none}
+body::before{width:280px;height:280px;top:-70px;left:-80px;animation:drift 14s ease-in-out infinite}
+body::after{width:340px;height:340px;bottom:-110px;right:-100px;animation:drift 18s ease-in-out infinite reverse}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,50px) scale(1.15)}}
+.btn,nav button{position:relative;overflow:hidden}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:rip .6s ease-out;pointer-events:none}
+@keyframes rip{to{transform:scale(3);opacity:0}}
+.q{animation:fadeUp .5s both;animation-delay:calc(var(--i,0)*40ms)}
+.cf{position:fixed;top:-14px;width:9px;height:14px;z-index:60;border-radius:2px;pointer-events:none;animation:cfall linear forwards}
+@keyframes cfall{to{transform:translate(var(--cx),105vh) rotate(720deg);opacity:.85}}
+@media (prefers-reduced-motion:reduce){.cf,#wash{display:none}}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:8px 0 14px}
+.stat{position:relative;padding:12px;border-radius:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 20%,var(--card)),var(--card));border:1px solid var(--bd);animation:pop .6s cubic-bezier(.2,1.4,.4,1) both;overflow:hidden}
+.stat:nth-child(2){animation-delay:.08s}.stat:nth-child(3){animation-delay:.16s}.stat:nth-child(4){animation-delay:.24s}
+.stat .si{position:absolute;right:8px;top:4px;font-size:26px;opacity:.35;animation:float 3s ease-in-out infinite}
+.stat b{display:block;font-size:30px;line-height:1.1;color:var(--ac)}.stat span{font-size:12px;color:var(--mut)}
+.dtab{border-collapse:separate;border-spacing:0 6px}.dtab th{border:0;text-align:left;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--card)}
+.dtab td{border:0;padding:9px 8px;background:color-mix(in srgb,var(--ac) 5%,var(--card));transition:background .2s}
+.dtab td:first-child{border-radius:10px 0 0 10px}.dtab td:last-child{border-radius:0 10px 10px 0}
+.dtab tbody tr{animation:rowin .55s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--i)*55ms)}
+.dtab tbody tr:hover td{background:color-mix(in srgb,var(--ac) 16%,var(--card))}
+@keyframes rowin{from{opacity:0;transform:translateX(40px) scale(.97)}to{opacity:1;transform:none}}
+.bar{display:inline-block;width:60px;height:8px;border-radius:8px;background:var(--bd);vertical-align:middle;margin-right:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);border-radius:8px;background:var(--ok);animation:grow 1s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--i)*55ms + .3s)}.bar i.hi{background:var(--bad)}
+@keyframes grow{from{width:0}}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-weight:700;font-size:13px}.tag.ok{background:rgba(31,157,99,.18);color:var(--ok)}.tag.bad{background:rgba(214,69,69,.18);color:var(--bad)}
+.x{border:0;background:transparent;color:var(--mut);cursor:pointer;font-size:14px;border-radius:50%;width:26px;height:26px;transition:transform .3s,background .2s,color .2s}.x:hover{background:var(--bad);color:#fff;transform:rotate(180deg)}
+.empty{text-align:center;padding:26px 0;color:var(--mut)}.empty div{font-size:46px;animation:float 3s ease-in-out infinite}
+.dd.open .dd-l li{animation:liin .35s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(var(--k)*40ms)}
+@keyframes liin{from{opacity:0;transform:translateX(-16px) scale(.94)}to{opacity:1;transform:none}}
+.dd-l li.sel::after{content:"✓";float:right;margin-left:14px;animation:pop .35s both}
+.dd-b.bump{animation:bump .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bump{0%{transform:scale(.94)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+#t-q>*:not(#qs):not(#qres){animation:fadeUp .55s cubic-bezier(.2,.9,.25,1) both;animation-delay:calc(min(var(--i,0),14)*45ms)}
+
+.q:has(.dd.open),#t-q>*:has(.dd.open){position:relative;z-index:60}
+.q:has(.dd.open){background:color-mix(in srgb,var(--ac) 7%,transparent)}
+.dd.open{z-index:70}
+</style></head><body><main>
+<div id="wash"></div><h1><span id="eyeico">👁️</span> ГлазОК</h1>
+<p class="sub">Исследование зрительного утомления и помощь глазам. Это не медицинский тест и не проверка остроты зрения.</p>
+<nav id="nav"></nav>
+
+<section id="t-q" class="card"></section>
+<section id="t-b" class="card" hidden></section>
+<section id="t-t" class="card" hidden></section>
+<section id="t-g" class="card" hidden></section>
+<section id="t-d" class="card" hidden></section>
+
+<script>
+const $=id=>document.getElementById(id);
+const tabs=[['q','📝 Анкета CVS-Q'],['b','🔤 Проба Бурдона'],['t','⏱ Таймер 20-20-20'],['g','🧘 Гимнастика'],['d','📊 Данные']];
+let cur='q',xy=[innerWidth/2,80];
+document.addEventListener('pointerdown',e=>{xy=[e.clientX,e.clientY]},true);
+function show(k){const d=Math.sign(tabs.findIndex(t=>t[0]===k)-tabs.findIndex(t=>t[0]===cur))||1;cur=k;document.body.dataset.sec=k;const c=$('t-'+k);c.hidden=false;c.style.setProperty('--dx',d*60+'px');c.style.setProperty('--ry',d*-8+'deg');c.classList.remove('in');void c.offsetWidth;c.classList.add('in');
+const w=$('wash');w.style.setProperty('--x',xy[0]+'px');w.style.setProperty('--y',xy[1]+'px');w.style.background='color-mix(in srgb,'+getComputedStyle(document.body).getPropertyValue('--ac')+' 28%,transparent)';w.classList.remove('go');void w.offsetWidth;w.classList.add('go');window.scrollTo({top:0,behavior:'smooth'});tabs.forEach(([x])=>$('t-'+x).hidden=x!==k);[...$('nav').children].forEach((b,i)=>b.classList.toggle('on',tabs[i][0]===k));if(k==='d')renderData();if(k!=='g')stopGym()}
+tabs.forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>show(k);$('nav').appendChild(b)});
+
+// ---- storage
+let rows=[];
+try{rows=JSON.parse(localStorage.getItem('eye_rows')||'[]')}catch(e){}
+function save(r){rows.push(Object.assign({date:new Date().toISOString().slice(0,16).replace('T',' ')},r));try{localStorage.setItem('eye_rows',JSON.stringify(rows))}catch(e){}}
+
+// ---- participant
+const S=["Жжение","Зуд","Ощущение инородного тела","Слезотечение","Частое моргание","Покраснение глаз","Боль в глазах","Тяжесть в веках","Сухость глаз","Нечёткое зрение","Двоение в глазах","Трудность фокусировки вблизи","Повышенная чувствительность к свету","Цветные круги вокруг предметов","Ощущение ухудшения зрения","Головная боль"];
+$('t-q').innerHTML=`<h2>Кто проходит</h2>
+<label>Анонимный код участника (например, 10А-07)</label><input id="code">
+<label>Среднее экранное время в день за 7 дней, часов (из «Экранного времени» / «Цифрового благополучия»)</label><input id="scr" type="number" min="0" max="24" step="0.1">
+<label>Этап</label><select id="stage"><option>обычное состояние</option><option>до работы за экраном</option><option>после работы за экраном</option></select>
+<label>Возраст</label><input id="age" type="number" min="10" max="19">
+<label>Пол</label><select id="sex"><option value="">не указывать</option><option>м</option><option>ж</option></select>
+<label>Основное устройство</label><select id="dev"><option>смартфон</option><option>компьютер / ноутбук</option><option>планшет</option><option>телевизор</option></select>
+<label>Очки или линзы</label><select id="gl"><option>не ношу</option><option>очки</option><option>линзы</option></select>
+<label>Сон в среднем, часов</label><input id="sl" type="number" min="3" max="14" step="0.5">
+<label>Перерывы при работе за экраном</label><select id="br"><option>почти никогда</option><option>раз в час</option><option>раз в 20–30 минут</option></select>
+<label>Время на улице в день, часов</label><input id="out" type="number" min="0" max="12" step="0.5">
+<label>Освещение при работе за экраном</label><select id="lt"><option>тёмная комната</option><option>тусклый свет</option><option>нормальное</option><option>дневной свет</option></select>
+<label>Яркость экрана</label><select id="brt"><option>низкая</option><option>средняя</option><option>высокая</option></select>
+<h2 style="margin-top:14px">Опросник зрительного утомления (CVS-Q)</h2>
+<p class="note">Ответы «редко/иногда» и «часто/постоянно» в подсчёте объединяются по методике CVS-Q. Адаптированная русская версия международного опросника Computer Vision Syndrome Questionnaire. Отвечайте о симптомах за время работы за экраном.</p>
+<div id="qs"></div><button class="btn" id="calc">Посчитать</button><div id="qres"></div>`;
+$('qs').innerHTML=S.map((s,i)=>`<div class="q"><b>${i+1}. ${s}</b>
+<span>Как часто: <select data-f="${i}"><option value="0">никогда</option><option value="1">редко</option><option value="1">иногда</option><option value="2">часто</option><option value="2">постоянно</option></select></span>
+<span>Интенсивность: <select data-i="${i}"><option value="1">слабая</option><option value="1">умеренная</option><option value="2">сильная</option></select></span></div>`).join('');
+const prof=()=>({code:$('code').value||'—',stage:$('stage').value,screen_h:$('scr').value,age:$('age').value,sex:$('sex').value,device:$('dev').value,glasses:$('gl').value,sleep_h:$('sl').value,breaks:$('br').value,outdoor_h:$('out').value,light:$('lt').value,brightness:$('brt').value});
+$('calc').onclick=()=>{let sum=0;S.forEach((_,i)=>{const f=+document.querySelector(`[data-f="${i}"]`).value,n=+document.querySelector(`[data-i="${i}"]`).value,p=f*n;sum+=p===0?0:p<=2?1:2});
+const flag=sum>=6;if(!flag)confetti();$('qres').innerHTML=`<div class="big">${sum} / 32</div><div class="res ${flag?'bad':'ok'}">${flag?'Есть признаки зрительного утомления (компьютерного зрительного синдрома). Делайте перерывы и при жалобах обратитесь к врачу.':'Признаков выраженного зрительного утомления нет.'}</div>${flag?'<button class="btn pulse" onclick="show(\'g\')">🧘 Перейти к гимнастике для глаз</button>':''}`;
+save(Object.assign(prof(),{cvsq:sum,cvsq_flag:flag?1:0}))};
+
+// ---- Burdon
+const L="КРНЕТАСО",T=["К","Р"];let bt=null,bleft=60,cells=[];
+$('t-b').innerHTML=`<h2>Проба Бурдона</h2><p><b>Что это?</b> Классическая психологическая методика, которой проверяют внимание и утомляемость: нужно быстро находить в таблице букв заданные и не хвататься за лишние. Чем больше устал человек, тем больше ошибок и пропусков.</p>
+<p class="note">За 60 секунд нажимайте все буквы <b>К</b> и <b>Р</b>. Лучше пройти до и после получаса за экраном и сравнить.</p>
+<button class="btn" id="bs">Начать</button> <b id="btm"></b><div class="grid" id="bg" style="margin-top:8px"></div><div id="bres"></div>`;
+$('bs').onclick=()=>{clearInterval(bt);$('bres').innerHTML='';bleft=60;$('btm').textContent='⏱ 60';
+$('bg').innerHTML='';cells=[];for(let i=0;i<300;i++){const c=document.createElement('i'),l=L[Math.floor(Math.random()*L.length)];c.textContent=l;c.onclick=()=>c.classList.toggle('s');$('bg').appendChild(c);cells.push(c)}
+bt=setInterval(()=>{bleft--;$('btm').textContent='⏱ '+bleft;if(bleft<=0){clearInterval(bt);finishB()}},1000)};
+function finishB(){let ok=0,err=0,miss=0;cells.forEach(c=>{const t=T.includes(c.textContent),s=c.classList.contains('s');if(t&&s)ok++;else if(!t&&s)err++;else if(t)miss++;c.onclick=null});
+const tot=ok+miss,acc=tot?Math.round(ok/tot*100):0;
+const eT=err<=2?['ok','Ошибок мало: внимание устойчивое, вы не хватались за лишние буквы.']:err<=6?['ok','Ошибок немного: внимание в пределах нормы, но немного рассеивается.']:['bad','Ошибок много: вы нажимали лишние буквы. Так бывает при спешке или утомлении, внимание снижено.'];
+const aT=acc>=60?'Вы нашли большую часть нужных букв.':acc>=35?'Вы нашли примерно половину нужных букв: это средний темп.':'Нужных букв найдено мало: темп низкий, возможна усталость.';
+$('btm').textContent='Время вышло';confetti();$('bres').innerHTML=`<div class="res ${eT[0]}">Верно: ${ok} · Ошибок: ${err} · Пропущено: ${miss}
+<p class="bd">✅ <b>Точность поиска: ${acc}%.</b> ${aT}</p>
+<p class="bd">⚠️ <b>Ошибки (${err}):</b> это лишние буквы, которые вы нажали. ${eT[1]}</p>
+<p class="bd">👀 <b>Пропуски (${miss}):</b> нужные буквы, которые вы не нашли. Много пропусков значит медленный поиск или потерю концентрации.</p>
+<p class="bd">Это ориентир, а не диагноз. Самое ценное для проекта: пройти пробу до и после работы за экраном и сравнить ошибки и точность.</p></div>`;
+save(Object.assign(prof(),{burdon_ok:ok,burdon_err:err,burdon_miss:miss}))}
+
+// ---- beep
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator();o.connect(a.destination);o.frequency.value=880;o.start();setTimeout(()=>{o.stop();a.close()},350)}catch(e){}}
+
+// ---- 20-20-20
+let tt=null,tsec=0,tmode='work';
+$('t-t').innerHTML=`<h2>Правило 20-20-20</h2><p class="note">Каждые 20 минут смотрите на предмет в 6 метрах (20 футов) в течение 20 секунд.</p>
+<label>Минут работы до перерыва</label><input id="tmin" type="number" value="20" min="1" max="60">
+<div class="big" id="tdisp">20:00</div><div style="text-align:center" id="tmsg" class="note">Нажмите «Старт»</div>
+<div style="text-align:center"><button class="btn" id="ts">Старт</button><button class="btn g" id="tx">Стоп</button></div>`;
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+$('ts').onclick=()=>{clearInterval(tt);tmode='work';tsec=(+$('tmin').value||20)*60;$('tmsg').textContent='Работаем…';$('tdisp').classList.add('run');
+tt=setInterval(()=>{tsec--;$('tdisp').textContent=fmt(Math.max(tsec,0));$('tdisp').classList.toggle('rest',tmode==='rest'&&tsec>0);if(tsec<=0){beep();if(tmode==='work'){tmode='rest';tsec=20;$('tmsg').textContent='👀 Посмотрите вдаль на 20 секунд!'}else{tmode='work';tsec=(+$('tmin').value||20)*60;$('tmsg').textContent='Работаем…'}}},1000)};
+$('tx').onclick=()=>{clearInterval(tt);$('tdisp').classList.remove('run');$('tdisp').textContent=fmt((+$('tmin').value||20)*60);$('tmsg').textContent='Остановлено'};
+
+// ---- Gymnastics
+$('t-g').innerHTML=`<h2>Гимнастика для глаз</h2><p class="note">Следите за шариком глазами, не поворачивая головы. Около 30 секунд на упражнение.</p>
+<div class="stage" id="stg"><div id="ball"></div></div><div style="margin-top:8px">
+<button class="btn" data-m="h">↔ Влево-вправо</button><button class="btn" data-m="v">↕ Вверх-вниз</button><button class="btn" data-m="d">⤢ По диагонали</button><button class="btn" data-m="c">⭕ По кругу</button><button class="btn" data-m="e">∞ Восьмёрка</button><button class="btn" data-m="zz">〰 Зигзаг</button><button class="btn" data-m="sp">🌀 Спираль</button><button class="btn" data-m="r">🎯 Прыжки по точкам</button><button class="btn" data-m="z">🔍 Ближе-дальше</button><button class="btn" data-m="bl">😉 Моргание</button><button class="btn g" id="gx">Стоп</button></div>`;
+let gr=null;function stopGym(){if(gr)cancelAnimationFrame(gr);gr=null}
+function gym(m){stopGym();const st=$('stg'),b=$('ball'),t0=performance.now();
+(function f(n){const t=(n-t0)/1000,W=st.clientWidth-36,H=st.clientHeight-36,s=(Math.sin(t*1.6)+1)/2;let x=W/2,y=H/2,sc=1;
+if(m==='h')x=s*W;if(m==='v')y=s*H;if(m==='c'){x=W/2+Math.cos(t*1.6)*W/2.2;y=H/2+Math.sin(t*1.6)*H/2.2}if(m==='z'){sc=.4+s*2.2}
+if(m==='d'){x=s*W;y=s*H}
+if(m==='e'){x=W/2+Math.sin(t*1.4)*W/2.2;y=H/2+Math.sin(t*2.8)*H/2.4}
+if(m==='zz'){x=Math.abs(((t*.4)%2)-1)*W;y=Math.abs(((t*1.6)%2)-1)*H}
+if(m==='sp'){const q=(Math.sin(t*.6)+1)/2;x=W/2+Math.cos(t*3)*q*W/2.2;y=H/2+Math.sin(t*3)*q*H/2.2}
+if(m==='r'){const k=Math.floor(t),u=a=>((Math.sin(k*a)*43758.5453)%1+1)%1;x=u(12.9898)*W;y=u(78.233)*H}
+b.style.opacity=m==='bl'&&Math.floor(t)%2?.12:1;
+b.style.transform=`translate(${x}px,${y}px) scale(${sc})`;gr=requestAnimationFrame(f)})(t0)}
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>gym(b.dataset.m));$('gx').onclick=stopGym;
+
+// ---- Data
+$('t-d').innerHTML=`<h2>Данные исследования</h2><p class="note">Результаты хранятся только в этом браузере. Скопируйте CSV и вставьте в Excel или Google Таблицы для расчёта корреляции (Спирмена) и сравнения групп.</p>
+<div class="tbl" id="dt"></div><button class="btn" id="cp">Копировать CSV</button><button class="btn g" id="cl">Очистить</button>
+<textarea id="csv" rows="6" readonly style="margin-top:8px"></textarea>`;
+function persist(){try{localStorage.setItem('eye_rows',JSON.stringify(rows))}catch(e){}}
+const cols=["date","code","stage","screen_h","age","sex","device","glasses","sleep_h","breaks","outdoor_h","light","brightness","cvsq","cvsq_flag","burdon_ok","burdon_err","burdon_miss"];
+function countUp(el,to,dec){const t0=performance.now();(function f(n){const p=Math.min((n-t0)/800,1),e=1-Math.pow(1-p,3);el.textContent=(to*e).toFixed(dec);if(p<1)requestAnimationFrame(f)})(t0)}
+function renderData(){
+const cq=rows.filter(r=>r.cvsq!==undefined),av=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const st=[['📋',rows.length,0,'записей'],['📝',av(cq.map(r=>+r.cvsq)),1,'средний балл CVS-Q'],['⚠️',cq.length?100*cq.filter(r=>+r.cvsq_flag).length/cq.length:0,0,'% с признаками'],['📱',av(rows.filter(r=>r.screen_h).map(r=>+r.screen_h)),1,'ч экрана в день']];
+$('dt').innerHTML=`<div class="stats">${st.map(([i,v,d,l])=>`<div class="stat"><div class="si">${i}</div><b data-v="${v}" data-d="${d}">0</b><span>${l}</span></div>`).join('')}</div>`+(rows.length?`<div class="tbl"><table class="dtab"><thead><tr><th>Дата</th><th>Код</th><th>Этап</th><th>Экран, ч</th><th>CVS-Q</th><th>Бурдон</th><th></th></tr></thead><tbody>${rows.map((r,i)=>`<tr style="--i:${i}"><td>${r.date}</td><td><b>${r.code}</b></td><td>${r.stage}</td><td>${r.screen_h||'—'}</td><td>${r.cvsq!==undefined?`<span class="bar"><i class="${r.cvsq_flag?'hi':''}" style="--w:${Math.min(r.cvsq/32*100,100)}%"></i></span><span class="tag ${r.cvsq_flag?'bad':'ok'}">${r.cvsq}</span>`:'—'}</td><td>${r.burdon_ok!==undefined?`✔ ${r.burdon_ok} · ✖ ${r.burdon_err} · ◌ ${r.burdon_miss}`:'—'}</td><td><button class="x" data-i="${i}" title="Удалить запись">✕</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty"><div>🫥</div>Пока пусто.<br>Пройдите анкету или пробу Бурдона.</div>');
+$('dt').querySelectorAll('.stat b').forEach(b=>countUp(b,+b.dataset.v,+b.dataset.d));
+$('dt').querySelectorAll('.x').forEach(b=>b.onclick=()=>{rows.splice(+b.dataset.i,1);persist();renderData()});
+$('csv').value=[cols.join(',')].concat(rows.map(r=>cols.map(c=>r[c]??'').join(','))).join('\n')}
+$('cp').onclick=()=>{$('csv').select();try{navigator.clipboard.writeText($('csv').value)}catch(e){document.execCommand('copy')}$('cp').textContent='Скопировано ✓'};
+$('cl').onclick=()=>{if(confirm('Удалить все данные?')){rows=[];try{localStorage.removeItem('eye_rows')}catch(e){}renderData()}};
+document.querySelectorAll('#qs select').forEach(el=>el.addEventListener('change',()=>{const i=el.selectedIndex;el.dataset.l=el.hasAttribute('data-f')?(i===0?0:i<3?1:2):i}));
+function enhance(sel){const w=document.createElement('div');w.className='dd';sel.parentNode.insertBefore(w,sel);w.appendChild(sel);sel.classList.add('hid');
+const b=document.createElement('button');b.type='button';b.className='dd-b';const ul=document.createElement('ul');ul.className='dd-l';w.append(b,ul);
+[...sel.options].forEach((o,i)=>{const li=document.createElement('li');li.textContent=o.textContent;li.style.setProperty('--k',i);li.onclick=()=>{sel.selectedIndex=i;sel.dispatchEvent(new Event('change'));sync();b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');w.classList.remove('open')};ul.appendChild(li)});
+function sync(){b.textContent=sel.options[sel.selectedIndex].textContent;b.dataset.l=sel.dataset.l||0;[...ul.children].forEach((li,i)=>li.classList.toggle('sel',i===sel.selectedIndex))}
+b.onclick=e=>{e.stopPropagation();const o=w.classList.contains('open');document.querySelectorAll('.dd.open').forEach(x=>x.classList.remove('open'));if(!o)w.classList.add('open')};sync()}
+document.querySelectorAll('select').forEach(enhance);[...$('t-q').children].forEach((c,i)=>c.style.setProperty('--i',i));
+document.addEventListener('click',()=>document.querySelectorAll('.dd.open').forEach(x=>x.classList.remove('open')));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.dd.open').forEach(x=>x.classList.remove('open'))});
+document.querySelectorAll('#qs .q').forEach((q,i)=>q.style.setProperty('--i',i));
+document.addEventListener('click',e=>{const b=e.target.closest('.btn,nav button');if(!b)return;const r=b.getBoundingClientRect(),z=Math.max(r.width,r.height),s=document.createElement('span');s.className='rip';s.style.cssText=`width:${z}px;height:${z}px;left:${e.clientX-r.left-z/2}px;top:${e.clientY-r.top-z/2}px`;b.appendChild(s);setTimeout(()=>s.remove(),650)});
+function confetti(){const C=['#3b7cff','#8a5cf6','#e0508b','#f08a24','#19a974','#ffd23f'];for(let i=0;i<48;i++){const p=document.createElement('i');p.className='cf';p.style.cssText=`left:${Math.random()*100}vw;background:${C[i%6]};--cx:${(Math.random()-.5)*160}px;animation-duration:${1.6+Math.random()*1.6}s;animation-delay:${Math.random()*.4}s`;document.body.appendChild(p);setTimeout(()=>p.remove(),3800)}}
+show('q');
+</script></main></body></html>
